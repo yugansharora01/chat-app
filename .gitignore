@@ -18,15 +18,29 @@ db.sqlite3
 media/
 staticfiles/
 
+# ========================
+# Node / React / Vite (client)
+# ========================
+client/node_modules/
+client/.vite/
+client/dist/
+client/.env.local
+client/.env.*.local
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/.DS_Store
+
 # Environment variables
 .env
 
 # VS Code settings
 .vscode/
 
-# Mac OS
+# ========================
+# OS / Editor
+# ========================
 .DS_Store
-
-# Windows
 Thumbs.db
-ehthumbs.db
+*.swp
+*.swo

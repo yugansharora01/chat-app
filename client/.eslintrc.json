@@ -1,0 +1,97 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "@stylistic",
+    "prettier",
+    "import",
+    "react",
+    "react-hooks"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "__dirname"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "@stylistic/type-annotation-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true,
+        "overrides": { "arrow": { "before": true, "after": true } }
+      }
+    ],
+    "@typescript-eslint/no-duplicate-enum-values": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "import/no-duplicates": "error",
+    "@typescript-eslint/default-param-last": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["./", "../"],
+            "message": "Relative imports are not allowed. Use path aliases instead."
+          }
+        ]
+      }
+    ],
+    "brace-style": "error",
+    "comma-dangle": ["error", "always-multiline"],
+    "curly": ["error", "all"],
+    "@typescript-eslint/no-explicit-any": "off",
+    "eqeqeq": ["error", "always"],
+    "keyword-spacing": ["error", { "before": true, "after": true }],
+    "max-len": [
+      "error",
+      {
+        "code": 150,
+        "ignoreComments": true,
+        "ignoreUrls": true,
+        "ignoreRegExpLiterals": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "no-console": "warn",
+    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 1 }],
+    "no-redeclare": ["error", { "builtinGlobals": true }],
+    "no-var": "error",
+    "object-curly-spacing": ["error", "always"],
+    "prefer-const": [
+      "error",
+      { "destructuring": "all", "ignoreReadBeforeAssign": true }
+    ],
+    "quotes": ["error", "double", { "avoidEscape": true }],
+    "semi": ["error", "always"],
+    "space-before-blocks": ["error", "always"],
+    "space-infix-ops": ["error", { "int32Hint": false }],
+    "space-in-parens": ["error", "never"],
+    "arrow-spacing": ["error", { "before": true, "after": true }],
+    "prettier/prettier": ["error"],
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off"
+  }
+}

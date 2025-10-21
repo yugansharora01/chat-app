@@ -1,5 +1,4 @@
 from django.db import models
-
 from core.enums import Role
 
 # Create your models here.

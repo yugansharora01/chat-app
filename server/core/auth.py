@@ -12,5 +12,4 @@ class SupabaseAuthentication(authentication.BaseAuthentication):
         user_id = payload.get("sub")
         if not user_id:
             raise exceptions.AuthenticationFailed("Invalid token payload")
-        print(f"Authenticated user ID: {user_id}")
         return (type("User", (), {"id": user_id})(), None)

@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -143,4 +145,4 @@ REST_FRAMEWORK = {
     ),
 }
 
-SUPABASE_PUBLIC_KEY="df51d35e-3032-4a04-a464-ff4dab686bcf"
+SUPABASE_JWT_SECRET="df51d35e-3032-4a04-a464-ff4dab686bcf"

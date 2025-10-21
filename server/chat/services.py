@@ -5,8 +5,21 @@ def add_message(user_id, role, content):
     message.save()
     return message
 
-def get_all_messages(user_id):
-    return Message.objects.filter(user_id=user_id)
+from typing import Optional
+
+def get_all_messages(user_id, cursor=None, limit=20):
+    qs = Message.objects.filter(user_id=user_id).order_by('-id')  # newest first
+
+    if cursor:
+        qs = qs.filter(id__lt=cursor)  # get messages older than cursor
+
+    messages = list(qs[:limit])  # convert to list to avoid slicing issues
+    next_cursor = messages[-1].id if messages else None  # get last item's ID safely
+    messages.reverse()  # oldest first
+
+    return messages, next_cursor
+
+
 
 def generate_response(user_message):
     # Placeholder for actual response generation logic

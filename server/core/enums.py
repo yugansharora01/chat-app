@@ -8,4 +8,5 @@ class Role(Enum):
 
     @classmethod
     def choices(cls):
-        return [(key.value, key.name) for key in cls]
+        return [(key.value, key.value) for key in cls]
+

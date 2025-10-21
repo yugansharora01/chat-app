@@ -14,9 +14,17 @@ class MessageView(APIView):
         Fetch chat history for the logged-in user.
         """
         user = request.user
-        messages = get_all_messages(user.id)
+        cursor = request.query_params.get("cursor")
+        limit = int(request.query_params.get("limit", 20))
+        messages,next_cursor = get_all_messages(user.id,cursor,limit)
         serialized_messages = MessageSerializer(messages, many=True).data
-        return response.success(serialized_messages)
+        payload = {
+            "messages": serialized_messages,
+            "meta": {
+                "next_cursor": next_cursor,
+            },
+        }
+        return response.success(payload)
     
     def post(self,request):
         """

@@ -8,8 +8,12 @@
   @apply w-[70%] max-w-[1000px] h-[100vh] flex flex-col;
 }
 
-.messagesBox {
-  @apply w-full mb-4 bg-gray-800 rounded-lg flex flex-1;
+.messagesContainer {
+  @apply w-full mb-4 bg-gray-800 rounded-lg flex flex-1 flex-col;
+}
+
+.messageBox{
+  @apply flex gap-2 p-4 overflow-y-auto border border-gray-700;
 }
 
 .chatFooter {

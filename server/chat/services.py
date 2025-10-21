@@ -1,11 +1,11 @@
-from models import Message
+from .models import Message
 
 def add_message(user_id, role, content):
     message = Message(user_id=user_id, role=role, content=content)
     message.save()
     return message
 
-def get_messages(user_id):
+def get_all_messages(user_id):
     return Message.objects.filter(user_id=user_id)
 
 def generate_response(user_message):

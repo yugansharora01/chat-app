@@ -1,27 +1,29 @@
 from rest_framework import permissions, status
+from rest_framework.views import APIView
 from chat.serializer import MessageSerializer
-from .services import add_message, get_chat_history, generate_response
+from .services import add_message, get_all_messages, generate_response
 import core.utils.response as response
 from core.enums import Role
 
 # Create your views here.
-class MessageView:
+class MessageView(APIView):
     permissionClasses = [permissions.IsAuthenticated]
 
-    def get_all_messages(self, request):
+    def get(self, request):
         """
         Fetch chat history for the logged-in user.
         """
         user = request.user
-        messages = get_chat_history(user.id)
+        messages = get_all_messages(user.id)
         serialized_messages = MessageSerializer(messages, many=True).data
         return response.success(serialized_messages)
     
-    def get_message_response(self,request):
+    def post(self,request):
         """
         Send a user message and get AI response.
         """
         user = request.user
+        print(f"Authenticated user: {user} {user.id}")
         message_content = request.data.get("message")
         if not message_content:
             return response.error("Message content is required", status=status.HTTP_400_BAD_REQUEST)
@@ -40,7 +42,6 @@ class MessageView:
         payload = {
             "messages": [user_serialized, ai_serialized],
             "meta": {
-                "conversation_length": get_chat_history(user.id).count(),
                 "model": "",  
             },
         }

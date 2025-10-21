@@ -1,15 +1,25 @@
 import jwt
-from django.conf import settings
+import requests
+import json
+from jwt import PyJWKClient
+from rest_framework import exceptions
 
-def verify_supabase_jwt(request):
-    auth_header = request.headers.get("Authorization")
-    if not auth_header:
-        return None
-    token = auth_header.split(" ")[1]
+JWKS_URL = "https://ujrlivuupaxnunvgagjk.supabase.co/auth/v1/.well-known/jwks.json"
+
+def verify_supabase_token(token):
     try:
-        payload = jwt.decode(token, settings.SUPABASE_PUBLIC_KEY, algorithms=["HS256"])
-        return type("User", (), {"id": payload.get("sub")})()  # simple user object
+        # Use PyJWKClient to fetch and parse the key automatically
+        jwks_client = PyJWKClient(JWKS_URL)
+        signing_key = jwks_client.get_signing_key_from_jwt(token).key
+
+        payload = jwt.decode(
+            token,
+            key=signing_key,
+            algorithms=["ES256"],
+            audience="authenticated",
+        )
+        return payload
     except jwt.ExpiredSignatureError:
-        return None
-    except jwt.InvalidTokenError:
-        return None
+        raise exceptions.AuthenticationFailed("Token expired")
+    except jwt.InvalidTokenError as e:
+        raise exceptions.AuthenticationFailed(f"Invalid token: {str(e)}")

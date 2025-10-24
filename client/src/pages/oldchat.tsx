@@ -1,5 +1,5 @@
 import { get_all_messages, send_message } from "@/API/apiservice";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import type { Message } from "@/types";
 import "@/styles/Home.css";

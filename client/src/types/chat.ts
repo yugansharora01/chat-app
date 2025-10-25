@@ -21,6 +21,6 @@ export interface Conversation {
   id: string;
   title: string;
   lastMessage: string;
-  timestamp: Date;
-  messages: Message[];
+  is_temporary?: boolean;
+  created_at: string;
 }

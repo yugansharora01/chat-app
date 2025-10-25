@@ -3,39 +3,29 @@ import { Navbar } from "@/components/Navbar";
 import { ConversationSidebar } from "@/components/ConversationSidebar";
 import ChatContainer from "@/components/ChatContainer";
 import { type Message, type Conversation, MessageRole } from "@/types";
-import { send_message } from "@/API/apiservice";
+import {
+  get_all_conversations,
+  get_all_messages,
+  send_message,
+} from "@/API/apiservice";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [conversations, setConversations] = useState<Conversation[]>([
-    {
-      id: "1",
-      title: "Welcome Chat",
-      lastMessage: "Hello! How can I help you today?",
-      timestamp: new Date(),
-      messages: [
-        {
-          id: "1",
-          userId: "ai",
-          content: "Hello! I'm your AI assistant. How can I help you today?",
-          role: MessageRole.AI,
-          timeStamp: new Date().toISOString(),
-        },
-      ],
-    },
-  ]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string>("1");
   const [isTyping, setIsTyping] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [nextCursor, setNextCursor] = useState("");
 
   const activeConversation = conversations.find(
-    (c) => c.id === activeConversationId
+    (conv) => conv.id === activeConversationId
   );
 
   const handleSendMessage = async (text: string) => {
-    if (!activeConversation) return;
+    if (!activeConversationId) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -45,44 +35,21 @@ const Index = () => {
       timeStamp: new Date().toISOString(),
     };
 
-    // Update conversation with new message
-    setConversations((prev) =>
-      prev.map((conv) =>
-        conv.id === activeConversationId
-          ? {
-              ...conv,
-              messages: [...conv.messages, userMessage],
-              lastMessage: text,
-              timestamp: new Date(),
-              title:
-                conv.messages.length === 1
-                  ? text.slice(0, 30) + (text.length > 30 ? "..." : "")
-                  : conv.title,
-            }
-          : conv
-      )
-    );
+    setMessages((prevMessages) => {
+      return [...prevMessages, userMessage];
+    });
 
     // Simulate AI response
     setIsTyping(true);
+    const conversation_id = activeConversation?.is_temporary
+      ? ""
+      : activeConversationId;
+    const response = await send_message(text, conversation_id);
+    setMessages((prevMessages) => {
+      prevMessages.pop(); // Remove the last user message added optimistically
+      return [...prevMessages, ...response.messages];
+    });
 
-    const response = await send_message(text);
-    const aiMessage: Message = response.messages[response.messages.length - 1];
-
-    setConversations((prev) =>
-      prev.map((conv) =>
-        conv.id === activeConversationId
-          ? {
-              ...conv,
-              messages: [...conv.messages, aiMessage],
-              lastMessage:
-                aiMessage.content.slice(0, 50) +
-                (aiMessage.content.length > 50 ? "..." : ""),
-              timestamp: new Date(),
-            }
-          : conv
-      )
-    );
     setIsTyping(false);
   };
 
@@ -91,8 +58,8 @@ const Index = () => {
       id: Date.now().toString(),
       title: "New Chat",
       lastMessage: "No messages yet",
-      timestamp: new Date(),
-      messages: [],
+      is_temporary: true,
+      created_at: new Date().toISOString(),
     };
     setConversations((prev) => [newConversation, ...prev]);
     setActiveConversationId(newConversation.id);
@@ -102,9 +69,39 @@ const Index = () => {
     setActiveConversationId(id);
   };
 
+  const fetchMessages = async () => {
+    const response = await get_all_messages(activeConversationId, nextCursor);
+    if (nextCursor) {
+      setMessages((prevMessages) => [...response.messages, ...prevMessages]);
+    } else {
+      setMessages(response.messages);
+    }
+    setNextCursor(response.meta.next_cursor);
+  };
+
+  const fetchConversations = async () => {
+    // Fetch conversations from server
+    const response = await get_all_conversations();
+    setConversations(response.conversations);
+    if (response.conversations.length > 0) {
+      setActiveConversationId(response.conversations[0].id);
+    }
+  };
+
+  useEffect(() => {
+    if (activeConversationId && conversations.length > 0) {
+      fetchMessages();
+    }
+  }, [activeConversationId]);
+
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
+    }
+
+    if (!loading && user) {
+      // Fetch conversations from server
+      fetchConversations();
     }
   }, [user, loading, navigate]);
 
@@ -132,7 +129,7 @@ const Index = () => {
         />
         <div className="flex-1">
           <ChatContainer
-            messages={activeConversation?.messages || []}
+            messages={messages || []}
             onSendMessage={handleSendMessage}
             isTyping={isTyping}
           />

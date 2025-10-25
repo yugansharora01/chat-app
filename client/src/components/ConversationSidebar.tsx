@@ -2,13 +2,7 @@ import { Plus, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-
-interface Conversation {
-  id: string;
-  title: string;
-  lastMessage: string;
-  timestamp: Date;
-}
+import type { Conversation } from "@/types";
 
 interface ConversationSidebarProps {
   conversations: Conversation[];

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { create_conversation } from "@/API/apiservice";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -13,9 +14,15 @@ export const useAuth = () => {
     // Set up auth state listener FIRST
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      console.log("Auth event:", event);
+      if (event === "SIGNED_IN" && session) {
+        await create_conversation("Welcome Chat", true, {
+          Authorization: `Bearer ${session.access_token}`,
+        });
+      }
       setLoading(false);
     });
 

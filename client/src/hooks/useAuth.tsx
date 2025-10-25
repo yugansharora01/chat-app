@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import type { User, Session } from '@supabase/supabase-js';
+import { useEffect, useState } from "react";
+import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabaseClient";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -11,13 +11,13 @@ export const useAuth = () => {
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -30,45 +30,46 @@ export const useAuth = () => {
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
+    const redirectUrl = window.location.origin;
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
-      }
+        emailRedirectTo: redirectUrl,
+      },
     });
-    
+
     if (error) throw error;
-    navigate('/');
+    navigate("/");
   };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     });
-    
+
     if (error) throw error;
-    navigate('/');
+    navigate("/");
   };
 
   const signInWithGoogle = async () => {
+    console.log("redirecting", window.location.origin);
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/`
-      }
+        redirectTo: window.location.origin,
+      },
     });
-    
+
     if (error) throw error;
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    navigate('/auth');
+    navigate("/auth");
   };
 
   return {
@@ -78,6 +79,6 @@ export const useAuth = () => {
     signUp,
     signIn,
     signInWithGoogle,
-    signOut
+    signOut,
   };
 };

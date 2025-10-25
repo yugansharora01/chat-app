@@ -3,8 +3,6 @@ import { ThemeProvider } from "next-themes";
 import "./App.css";
 import Home from "@/pages/index";
 import Chat from "@/pages/Chat";
-import SignUp from "@/pages/Signup";
-import Login from "@/pages/Login";
 import NotFound from "@/pages/NotFound";
 import Auth from "@/pages/Auth";
 
@@ -15,8 +13,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/chat" element={<Chat />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/auth" element={<Auth />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

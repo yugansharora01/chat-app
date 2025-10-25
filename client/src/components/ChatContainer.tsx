@@ -2,13 +2,7 @@ import { useEffect, useRef } from "react";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import { Loader2 } from "lucide-react";
-
-export interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  timestamp: Date;
-}
+import type { Message } from "@/types";
 
 interface ChatContainerProps {
   messages: Message[];
@@ -43,9 +37,9 @@ const ChatContainer = ({ messages, onSendMessage, isTyping = false }: ChatContai
               {messages.map((message) => (
                 <ChatMessage
                   key={message.id}
-                  message={message.text}
-                  isUser={message.isUser}
-                  timestamp={message.timestamp}
+                  message={message.content}
+                  role={message.role}
+                  timeStamp={message.timeStamp}
                 />
               ))}
               {isTyping && (

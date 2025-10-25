@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Navbar } from "@/components/Navbar";
 import { ConversationSidebar } from "@/components/ConversationSidebar";
 import ChatContainer from "@/components/ChatContainer";
@@ -14,43 +15,72 @@ import { useNavigate } from "react-router-dom";
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<string>("1");
+  const queryClient = useQueryClient();
+  const [activeConversationId, setActiveConversationId] = useState<string>("");
   const [isTyping, setIsTyping] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [nextCursor, setNextCursor] = useState("");
+
+  // Fetch conversations
+  const { data: conversationsData } = useQuery({
+    queryKey: ["conversations"],
+    queryFn: get_all_conversations,
+    enabled: !!user,
+  });
 
   const activeConversation = conversations.find(
     (conv) => conv.id === activeConversationId
   );
 
-  const handleSendMessage = async (text: string) => {
+  // Fetch messages for the active conversation
+  const { data: messagesData, refetch: refetchMessages } = useQuery({
+    queryKey: ["messages", activeConversationId],
+    queryFn: () => get_all_messages(activeConversationId),
+    enabled: !!activeConversationId,
+  });
+
+  // Mutation to send message
+  const sendMessageMutation = useMutation({
+    mutationFn: ({
+      text,
+      conversationId,
+    }: {
+      text: string;
+      conversationId: string;
+    }) => send_message(text, conversationId),
+    onMutate: async ({ text }) => {
+      setIsTyping(true);
+      // Optimistic update
+      queryClient.setQueryData(
+        ["messages", activeConversationId],
+        (oldData: any) => ({
+          messages: [
+            ...(oldData?.messages || []),
+            {
+              id: Date.now().toString(),
+              userId: "user",
+              content: text,
+              role: MessageRole.user,
+              timeStamp: new Date().toISOString(),
+            },
+          ],
+        })
+      );
+    },
+    onSuccess: (response) => {
+      queryClient.setQueryData(["messages", activeConversationId], {
+        messages: response.messages,
+      });
+      setIsTyping(false);
+    },
+  });
+
+  const handleSendMessage = (text: string) => {
     if (!activeConversationId) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      userId: "user",
-      content: text,
-      role: MessageRole.USER,
-      timeStamp: new Date().toISOString(),
-    };
-
-    setMessages((prevMessages) => {
-      return [...prevMessages, userMessage];
-    });
-
-    // Simulate AI response
-    setIsTyping(true);
     const conversation_id = activeConversation?.is_temporary
       ? ""
       : activeConversationId;
-    const response = await send_message(text, conversation_id);
-    setMessages((prevMessages) => {
-      prevMessages.pop(); // Remove the last user message added optimistically
-      return [...prevMessages, ...response.messages];
-    });
-
-    setIsTyping(false);
+    sendMessageMutation.mutate({ text, conversationId: conversation_id });
   };
 
   const handleNewChat = () => {
@@ -62,6 +92,7 @@ const Index = () => {
       created_at: new Date().toISOString(),
     };
     setConversations((prev) => [newConversation, ...prev]);
+    //setMessages([]);
     setActiveConversationId(newConversation.id);
   };
 
@@ -69,41 +100,18 @@ const Index = () => {
     setActiveConversationId(id);
   };
 
-  const fetchMessages = async () => {
-    const response = await get_all_messages(activeConversationId, nextCursor);
-    if (nextCursor) {
-      setMessages((prevMessages) => [...response.messages, ...prevMessages]);
-    } else {
-      setMessages(response.messages);
+  useEffect(() => {
+    if (messagesData?.messages?.length) {
+      setMessages(messagesData?.messages);
     }
-    setNextCursor(response.meta.next_cursor);
-  };
-
-  const fetchConversations = async () => {
-    // Fetch conversations from server
-    const response = await get_all_conversations();
-    setConversations(response.conversations);
-    if (response.conversations.length > 0) {
-      setActiveConversationId(response.conversations[0].id);
-    }
-  };
+  }, [messagesData]);
 
   useEffect(() => {
-    if (activeConversationId && conversations.length > 0) {
-      fetchMessages();
+    if (conversationsData?.length && !activeConversationId) {
+      setActiveConversationId(conversationsData[0].id);
+      setConversations(conversationsData);
     }
-  }, [activeConversationId]);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    }
-
-    if (!loading && user) {
-      // Fetch conversations from server
-      fetchConversations();
-    }
-  }, [user, loading, navigate]);
+  }, [conversationsData]);
 
   if (loading) {
     return (
@@ -114,6 +122,7 @@ const Index = () => {
   }
 
   if (!user) {
+    navigate("/auth");
     return null;
   }
 
@@ -129,7 +138,7 @@ const Index = () => {
         />
         <div className="flex-1">
           <ChatContainer
-            messages={messages || []}
+            messages={messages}
             onSendMessage={handleSendMessage}
             isTyping={isTyping}
           />

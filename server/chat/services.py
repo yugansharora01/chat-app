@@ -28,7 +28,7 @@ def generate_response(user_message):
 def create_conversation(user_id, title):
     conversation = Conversation(user_id=user_id, title=title)
     conversation.save()
-    add_message(conversation.id, Role.AI, "Hello! How can I assist you today?")
+    add_message(conversation.id, Role.AI.value, "Hello! How can I assist you today?")
     return conversation
 
 def get_conversations(user_id):

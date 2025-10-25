@@ -1,6 +1,6 @@
 // src/lib/ApiCall.ts
 import axiosClient from "@/API/axiosClient";
-import type { ChatResponse } from "@/types";
+import type { ChatResponse, Conversation, Message } from "@/types";
 import { authService } from "@/utils/AuthService";
 import { type AxiosRequestConfig, type Method } from "axios";
 
@@ -47,7 +47,7 @@ export const get_all_messages = async (
   conversation_id: string,
   cursor: string = "",
   limit: number = 10
-) => {
+): Promise<{ messages: Message[]; meta: Record<string, unknown> }> => {
   const response = await ApiCall(
     "GET",
     `${import.meta.env.VITE_SERVER_URL}/chat/messages/`,
@@ -65,12 +65,12 @@ export const delete_message = async (messageId: string) => {
   return response?.data;
 };
 
-export const get_all_conversations = async () => {
+export const get_all_conversations = async (): Promise<Conversation[]> => {
   const response = await ApiCall(
     "GET",
     `${import.meta.env.VITE_SERVER_URL}/chat/conversations/`
   );
-  return response?.data;
+  return response?.data?.conversations;
 };
 
 export const create_conversation = async (

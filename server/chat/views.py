@@ -48,11 +48,11 @@ class MessageView(APIView):
             conversation = Conversation.objects.get(id=conversation_id)
 
         # Save user message
-        user_message = add_message(conversation.id, Role.USER, message_content)
+        user_message = add_message(conversation.id, Role.USER.value, message_content)
 
         # Generate AI response
         bot_response = generate_response(message_content)
-        ai_message = add_message(conversation.id, Role.AI, bot_response)
+        ai_message = add_message(conversation.id, Role.AI.value, bot_response)
 
         # Serialize both messages
         user_serialized = MessageSerializer(user_message).data

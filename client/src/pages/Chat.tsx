@@ -62,14 +62,19 @@ const Index = () => {
               content: text,
               role: MessageRole.user,
               timeStamp: new Date().toISOString(),
+              isTemporary: true,
             },
           ],
         })
       );
     },
     onSuccess: (response) => {
+      const prevMessages = messages;
+      if(messages.length > 0 && messages[messages.length -1].isTemporary){
+        prevMessages.pop();
+      }
       queryClient.setQueryData(["messages", activeConversationId], {
-        messages: response.messages,
+        messages: [...prevMessages, ...response.messages],
       });
       setIsTyping(false);
     },

@@ -1,91 +1,40 @@
 import { useEffect, useState } from "react";
-import type { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/utils/supabaseClient";
+import { authService } from "@/utils/AuthService";
 import { useNavigate } from "react-router-dom";
-import { create_conversation } from "@/API/apiservice";
 
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<any>(authService.getUser());
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      console.log("Auth event:", event);
-      if (event === "SIGNED_IN" && session) {
-        await create_conversation("Welcome Chat", true, {
-          Authorization: `Bearer ${session.access_token}`,
-        });
-      }
+    const unsubscribe = authService.subscribe((user) => {
+      setUser(user);
       setLoading(false);
     });
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return unsubscribe;
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = window.location.origin;
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-      },
-    });
-
-    if (error) throw error;
+    await authService.signUp(email, password);
+    console.log("Sign-up successful, redirecting to home...");
     navigate("/");
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) throw error;
+    await authService.signIn(email, password);
+    console.log("Sign-in successful, redirecting to home...");
     navigate("/");
   };
 
   const signInWithGoogle = async () => {
-    console.log("redirecting", window.location.origin);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-
-    if (error) throw error;
+    await authService.signInWithGoogle();
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    await authService.signOut();
     navigate("/auth");
   };
 
-  return {
-    user,
-    session,
-    loading,
-    signUp,
-    signIn,
-    signInWithGoogle,
-    signOut,
-  };
+  return { user, loading, signUp, signIn, signInWithGoogle, signOut };
 };

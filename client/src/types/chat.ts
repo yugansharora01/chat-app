@@ -10,6 +10,7 @@ export interface Message {
   role: MessageRole;
   content: string;
   timeStamp: string;
+  isTemporary?: boolean;
 }
 
 export interface ChatResponse {

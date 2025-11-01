@@ -21,6 +21,12 @@ export const Navbar = ({ hideAvatar = false }: NavbarProps) => {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    console.log("Setting default theme to dark", theme);
+    if (theme === undefined) {
+      setTheme("dark");
+    }
+  }, [theme, setTheme]);
 
   return (
     <nav className="border-b bg-card">

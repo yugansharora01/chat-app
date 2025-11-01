@@ -12,7 +12,6 @@ export const ApiCall = async (
   customHeaders: Record<string, any> = {}
 ) => {
   const token = await authService.getAccessToken();
-  console.log("Using token:", token);
   const config: AxiosRequestConfig = {
     method,
     url,

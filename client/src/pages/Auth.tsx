@@ -98,7 +98,6 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar hideAvatar />
       <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-8">
         <Card className="w-full max-w-md">
           <CardHeader>

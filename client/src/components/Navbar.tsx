@@ -22,7 +22,6 @@ export const Navbar = ({ hideAvatar = false }: NavbarProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Setting default theme to dark", theme);
     if (theme === undefined) {
       setTheme("dark");
     }
@@ -51,7 +50,7 @@ export const Navbar = ({ hideAvatar = false }: NavbarProps) => {
             )}
           </Button>
 
-          {!hideAvatar && (
+          {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
@@ -62,7 +61,7 @@ export const Navbar = ({ hideAvatar = false }: NavbarProps) => {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-popover">
+              <DropdownMenuContent align="end" className="min-w-48 bg-popover">
                 <DropdownMenuItem className="cursor-pointer">
                   {user?.email}
                 </DropdownMenuItem>

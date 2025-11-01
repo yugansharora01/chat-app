@@ -1,22 +1,18 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { MessageSquare, Sparkles, Zap, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
 
 const Index = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-
       {/* Hero Section */}
       <section className="flex-1 flex items-center justify-center px-4 py-20 bg-gradient-to-br from-background via-background to-primary/5">
         <div className="max-w-4xl mx-auto text-center space-y-8">

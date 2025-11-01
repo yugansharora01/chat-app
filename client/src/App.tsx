@@ -7,6 +7,7 @@ import Chat from "@/pages/Chat";
 import NotFound from "@/pages/NotFound";
 import Auth from "@/pages/Auth";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Navbar } from "./components/Navbar";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ function App() {
       >
         <TooltipProvider>
           <BrowserRouter>
+          <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/chat" element={<Chat />} />

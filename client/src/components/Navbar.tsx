@@ -10,6 +10,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 interface NavbarProps {
   hideAvatar?: boolean;
@@ -17,13 +18,9 @@ interface NavbarProps {
 
 export const Navbar = ({ hideAvatar = false }: NavbarProps) => {
   const { theme, setTheme } = useTheme();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // TODO: Implement logout functionality
-    console.log("Logout clicked");
-  };
 
   return (
     <nav className="border-b bg-card">
@@ -60,6 +57,9 @@ export const Navbar = ({ hideAvatar = false }: NavbarProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-popover">
+                <DropdownMenuItem className="cursor-pointer">
+                  {user?.email}
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout

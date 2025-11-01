@@ -127,8 +127,7 @@ const Index = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <Navbar />
+    <div className="flex flex-col h-[calc(100vh-65px)]">
       <div className="flex flex-1 overflow-hidden">
         <ConversationSidebar
           conversations={conversations}

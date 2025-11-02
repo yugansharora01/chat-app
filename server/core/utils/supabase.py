@@ -10,6 +10,8 @@ JWKS_URL = f"https://{SUPABASE_URL}/auth/v1/.well-known/jwks.json"
 
 # Cache the JWKs client for a certain amount of time (e.g., 1 hour)
 class CachedPyJWKClient:
+    max_retries = 3
+    retry_delay = 0.5  # seconds
     def __init__(self, url, cache_ttl: int = 3600):
         self.url = url
         self.cache_ttl = cache_ttl
@@ -21,7 +23,13 @@ class CachedPyJWKClient:
         if self._jwks_client is None or current_time - self._last_fetch_time > self.cache_ttl:
             self._jwks_client = PyJWKClient(self.url)
             self._last_fetch_time = current_time
-        return self._jwks_client.get_signing_key_from_jwt(token).key
+        for attempt in range(self.max_retries):
+            try:
+                return self._jwks_client.get_signing_key_from_jwt(token).key
+            except Exception as e:
+                if attempt >= self.max_retries - 1:
+                    raise e
+                time.sleep(self.retry_delay)
 
 
 # Instantiate cached client
@@ -47,3 +55,6 @@ def verify_supabase_token(token: str):
         raise exceptions.AuthenticationFailed("Token expired")
     except InvalidTokenError as e:
         raise exceptions.AuthenticationFailed(f"Invalid token: {str(e)}")
+    except Exception as e:
+        # Catch SSL and network-related JWKS fetch errors
+        raise exceptions.AuthenticationFailed(f"Token verification failed: {str(e)}")

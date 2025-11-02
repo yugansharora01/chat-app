@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'chat',
+    'llm',
     "corsheaders"
 ]
 

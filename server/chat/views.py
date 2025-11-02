@@ -1,8 +1,10 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework.views import APIView
 from chat.models import Conversation
 from chat.serializer import ConversationSerializer, MessageSerializer
-from .services import add_message, create_conversation, get_all_messages, generate_response
+from llm.services import generate_with_history
+from .services import add_message, create_conversation, get_all_messages, generate_response, get_messages_for_llm, trim_messages_by_chars
 import core.utils.response as response
 from core.enums import Role
 
@@ -45,13 +47,24 @@ class MessageView(APIView):
         if not conversation_id:
             conversation = create_conversation(user.id, message_content[:20])  # use first 20 chars as title
         else:
-            conversation = Conversation.objects.get(id=conversation_id)
+            conversation = get_object_or_404(Conversation, id=conversation_id)
 
         # Save user message
         user_message = add_message(conversation.id, Role.USER.value, message_content)
 
-        # Generate AI response
-        bot_response = generate_response(message_content)
+       # 2) build history for LLM
+        messages = get_messages_for_llm(conversation_id, limit=200)
+        
+        # add a system prompt at the beginning
+        system_prompt = {"role": "system", "content": "You are a helpful assistant."}
+        messages = [system_prompt] + messages
+
+        # 3) trim context if needed
+        messages = trim_messages_by_chars(messages, max_chars=25000)
+
+        # 4) call the LLM provider
+        bot_response = generate_with_history(messages)
+
         ai_message = add_message(conversation.id, Role.AI.value, bot_response)
 
         # Serialize both messages

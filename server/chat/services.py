@@ -1,6 +1,6 @@
 from core.enums import Role
 from .models import Message , Conversation
-from typing import Optional
+from typing import List, Optional
 
 def add_message(conversation_id, role, content):
     message = Message(conversation_id=conversation_id, role=role, content=content)
@@ -9,7 +9,7 @@ def add_message(conversation_id, role, content):
 
 
 def get_all_messages(conversation_id, cursor=None, limit=20):
-    qs = Message.objects.filter(conversation_id=conversation_id).order_by('-id')  # newest first
+    qs = Message.objects.filter(conversation_id=conversation_id)
 
     if cursor:
         qs = qs.filter(id__lt=cursor)  # get messages older than cursor
@@ -42,3 +42,30 @@ def update_conversation_title(conversation_id, new_title):
         return conversation
     except Conversation.DoesNotExist:
         return None
+    
+def convert_messages_to_llm_format(all_messages:list[Message]):
+    messages = []
+    for m in all_messages:
+        # normalize role to lowercase: 'user' or 'assistant' or 'system'
+        role = m.role.lower()
+        messages.append({"role": role, "content": m.content})
+    return messages
+
+def get_messages_for_llm(conversation_id:int,limit:int = 50)->List[Message]:
+    all_messages, _ = get_all_messages(conversation_id,None,limit)
+    return convert_messages_to_llm_format(all_messages)
+
+def trim_messages_by_chars(messages,max_chars=30000):
+    """
+    Keep as many recent messages as will fit under max_chars.
+    Returns messages in chronological order.
+    """
+    total = 0
+    kept = []
+    for m in reversed(messages):
+        l = len(m["content"])
+        if total + l > max_chars and kept:
+            break
+        kept.append(m)
+        total += l
+    return list(reversed(kept))

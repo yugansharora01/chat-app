@@ -3,7 +3,7 @@ from enum import Enum
 
 class Role(Enum):
     USER = "user"
-    AI = "ai"
+    AI = "assistant"
     ADMIN = "admin"
 
     @classmethod

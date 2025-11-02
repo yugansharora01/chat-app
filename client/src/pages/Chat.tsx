@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Navbar } from "@/components/Navbar";
 import { ConversationSidebar } from "@/components/ConversationSidebar";
 import ChatContainer from "@/components/ChatContainer";
 import { type Message, type Conversation, MessageRole } from "@/types";
@@ -33,7 +32,7 @@ const Index = () => {
   );
 
   // Fetch messages for the active conversation
-  const { data: messagesData, refetch: refetchMessages } = useQuery({
+  const { data: messagesData } = useQuery({
     queryKey: ["messages", activeConversationId],
     queryFn: () => get_all_messages(activeConversationId),
     enabled: !!activeConversationId,

@@ -12,11 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 
-interface NavbarProps {
-  hideAvatar?: boolean;
-}
 
-export const Navbar = ({ hideAvatar = false }: NavbarProps) => {
+export const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();

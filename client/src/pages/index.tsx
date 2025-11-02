@@ -9,7 +9,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
 import { useState, useEffect } from "react";
 import scifiGrid from "/scifi-grid-bg.jpg";
 import { lerp } from "@/utils/helper";

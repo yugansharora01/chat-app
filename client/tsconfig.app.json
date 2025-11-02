@@ -25,9 +25,9 @@
     "noUncheckedSideEffectImports": true,
 
     /* ✅ Add this */
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["*"]
     }
   },
   "include": ["src"]

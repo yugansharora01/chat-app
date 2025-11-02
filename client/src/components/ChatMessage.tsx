@@ -4,10 +4,9 @@ import { MessageRole } from "@/types";
 interface ChatMessageProps {
   message: string;
   role: MessageRole;
-  timeStamp?: string;
 }
 
-const ChatMessage = ({ message, role, timeStamp }: ChatMessageProps) => {
+const ChatMessage = ({ message, role }: ChatMessageProps) => {
   return (
     <div
       className={cn(

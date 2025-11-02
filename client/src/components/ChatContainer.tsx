@@ -39,7 +39,6 @@ const ChatContainer = ({ messages, onSendMessage, isTyping = false }: ChatContai
                   key={message.id}
                   message={message.content}
                   role={message.role}
-                  timeStamp={message.timeStamp}
                 />
               ))}
               {isTyping && (

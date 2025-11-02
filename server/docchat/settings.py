@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-6y4s1!8ce=+b43wehf1)cvlsgt)y#40k0gm!t$+ye1ad=1q)+6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["chat-app-pfmi.onrender.com", "localhost", "127.0.0.1"]
 
 
 # Application definition

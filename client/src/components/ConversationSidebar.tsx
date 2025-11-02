@@ -1,5 +1,5 @@
 import { Plus, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import type { Conversation } from "@/types";
@@ -52,7 +52,7 @@ export const ConversationSidebar = ({
                   </p>
                 </div>
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       </ScrollArea>

@@ -33,7 +33,7 @@ export const ConversationSidebar = ({
       <ScrollArea className="flex-1">
         <div className="p-2 space-y-1">
           {conversations.map((conversation) => (
-            <button
+            <Button
               key={conversation.id}
               onClick={() => onSelectConversation(conversation.id)}
               className={cn(

@@ -35,14 +35,19 @@ def search_index(query_embedding, top_k=5, filter_conv=None):
         return []
 
     query_embedding = np.array([query_embedding]).astype("float32")
-    distances, ids = index.search(query_embedding, top_k)
+    distances, ids = index.search(query_embedding, top_k * 3)  # search wider
 
     results = []
     for idx in ids[0]:
-        if idx == -1: 
+        if idx == -1:
             continue
         meta = metadata[idx]
         if filter_conv and meta.get("conversation_id") != filter_conv:
             continue
+
         results.append(meta)
+        if len(results) >= top_k:
+            break
+
     return results
+

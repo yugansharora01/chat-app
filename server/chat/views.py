@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from chat.models import Conversation
 from chat.serializer import ConversationSerializer, MessageSerializer
 from llm.services import generate_with_history
-from .services import add_message, create_conversation, get_all_messages, generate_response, get_messages_for_llm, trim_messages_by_chars
+from .services import add_message, create_conversation, get_all_messages, generate_response, get_messages_for_llm, retrieve_relevant_messages, trim_messages_by_chars
 import core.utils.response as response
 from core.enums import Role
 
@@ -53,11 +53,11 @@ class MessageView(APIView):
         user_message = add_message(conversation.id, Role.USER.value, message_content)
 
        # 2) build history for LLM
-        messages = get_messages_for_llm(conversation_id, limit=200)
+        messages = retrieve_relevant_messages(conversation_id, message_content, top_k=8)
         
         # add a system prompt at the beginning
         system_prompt = {"role": "system", "content": "You are a helpful assistant."}
-        messages = [system_prompt] + messages
+        messages = [system_prompt] + list(reversed(messages))
 
         # 3) trim context if needed
         messages = trim_messages_by_chars(messages, max_chars=25000)

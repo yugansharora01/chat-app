@@ -96,7 +96,7 @@ const Index = () => {
       created_at: new Date().toISOString(),
     };
     setConversations((prev) => [newConversation, ...prev]);
-    //setMessages([]);
+    setMessages([]);
     setActiveConversationId(newConversation.id);
   };
 

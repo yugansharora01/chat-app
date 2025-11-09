@@ -53,11 +53,13 @@ class MessageView(APIView):
         user_message = add_message(conversation.id, Role.USER.value, message_content)
 
        # 2) build history for LLM
-        messages = retrieve_relevant_messages(conversation_id, message_content, top_k=8)
+        messages = retrieve_relevant_messages(conversation.id, message_content, top_k=8)
         
         # add a system prompt at the beginning
         system_prompt = {"role": "system", "content": "You are a helpful assistant."}
         messages = [system_prompt] + list(reversed(messages))
+
+        print("messages: ",messages)
 
         # 3) trim context if needed
         messages = trim_messages_by_chars(messages, max_chars=25000)

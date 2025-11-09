@@ -1,10 +1,20 @@
 from core.enums import Role
 from .models import Message , Conversation
 from typing import List, Optional
+from llm.embeddings import get_embedding
+from llm.vector_store import add_to_index, search_index
 
 def add_message(conversation_id, role, content):
     message = Message(conversation_id=conversation_id, role=role, content=content)
     message.save()
+     # Store vector
+    embedding = get_embedding(content)
+    add_to_index(embedding, {
+        "id": message.id,
+        "conversation_id": conversation_id,
+        "role": role,
+        "content": content
+    })
     return message
 
 
@@ -69,3 +79,11 @@ def trim_messages_by_chars(messages,max_chars=30000):
         kept.append(m)
         total += l
     return list(reversed(kept))
+
+def retrieve_relevant_messages(conversation_id, query, top_k=8):
+    query_emb = get_embedding(query)
+    results = search_index(query_emb, top_k=top_k, filter_conv=conversation_id)
+    return [
+        {"role": r["role"], "content": r["content"]}
+        for r in results
+    ]

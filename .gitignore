@@ -31,15 +31,12 @@ staticfiles/
 client/node_modules/
 client/.vite/
 client/dist/
-client/.env.local
-client/.env.*.local
 client/npm-debug.log*
 client/yarn-debug.log*
 client/yarn-error.log*
 client/.DS_Store
 
 # Environment variables
-.env
 
 # VS Code settings
 .vscode/

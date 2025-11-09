@@ -1,10 +1,22 @@
-from sentence_transformers import SentenceTransformer
-import numpy as np
-
-# Load a free local embedding model
-model = SentenceTransformer("all-MiniLM-L6-v2")  # small, 384-dim, great quality
+from huggingface_hub import InferenceClient
+import os
 
 def get_embedding(text: str):
-    if not text:
-        return np.zeros(384)
-    return model.encode(text, convert_to_numpy=True)
+    client = InferenceClient(
+        provider="hf-inference",
+        api_key=os.getenv("HF_API_KEY"),
+    )
+
+    embedding = client.feature_extraction(
+        text,
+        model="sentence-transformers/all-MiniLM-L6-v2",
+    )
+
+    # Handle numpy-like array or list of floats
+    if hasattr(embedding, "tolist"):
+        return embedding.tolist()
+    elif isinstance(embedding, list):
+        # Sometimes already a flat list
+        return embedding
+    else:
+        raise ValueError(f"Unexpected response type: {type(embedding)}")

@@ -2,15 +2,26 @@ import { useEffect, useRef } from "react";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import { Loader2 } from "lucide-react";
-import type { Message } from "@/types";
+import { MessageRole, type Message } from "@/types";
 
 interface ChatContainerProps {
   messages: Message[];
-  onSendMessage: (text: string) => void;
+  onSendMessage: (
+    text: string,
+    attachments?: Array<{ name: string; url: string; size: number }>
+  ) => void;
   isTyping?: boolean;
+  onEditMessage?: (messageId: string, newText: string) => void;
+  onDeleteMessage?: (messageId: string) => void;
 }
 
-const ChatContainer = ({ messages, onSendMessage, isTyping = false }: ChatContainerProps) => {
+const ChatContainer = ({
+  messages,
+  onSendMessage,
+  isTyping = false,
+  onEditMessage,
+  onDeleteMessage,
+}: ChatContainerProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -38,7 +49,19 @@ const ChatContainer = ({ messages, onSendMessage, isTyping = false }: ChatContai
                 <ChatMessage
                   key={message.id}
                   message={message.content}
-                  role={message.role}
+                  isUser={message.role === MessageRole.user}
+                  timestamp={message.timeStamp}
+                  attachments={message.attachments}
+                  onEdit={
+                    onEditMessage
+                      ? (newText) => onEditMessage(message.id, newText)
+                      : undefined
+                  }
+                  onDelete={
+                    onDeleteMessage
+                      ? () => onDeleteMessage(message.id)
+                      : undefined
+                  }
                 />
               ))}
               {isTyping && (

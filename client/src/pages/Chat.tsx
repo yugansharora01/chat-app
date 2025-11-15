@@ -69,7 +69,7 @@ const Index = () => {
     },
     onSuccess: (response) => {
       const prevMessages = messages;
-      if(messages.length > 0 && messages[messages.length -1].isTemporary){
+      if (messages.length > 0 && messages[messages.length - 1].isTemporary) {
         prevMessages.pop();
       }
       queryClient.setQueryData(["messages", activeConversationId], {

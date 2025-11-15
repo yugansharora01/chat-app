@@ -38,6 +38,7 @@ class MessageView(APIView):
         """
         user = request.user
         
+        file = request.FILES.get("file")
         message_content = request.data.get("message")
         conversation_id = request.data.get("conversation_id")
         if not message_content:
@@ -50,7 +51,7 @@ class MessageView(APIView):
             conversation = get_object_or_404(Conversation, id=conversation_id)
 
         # Save user message
-        user_message = add_message(conversation.id, Role.USER.value, message_content)
+        user_message = add_message(conversation.id, Role.USER.value, message_content, file)
 
        # 2) build history for LLM
         messages = retrieve_relevant_messages(conversation.id, message_content, top_k=8)

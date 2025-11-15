@@ -8,7 +8,7 @@ interface ChatContainerProps {
   messages: Message[];
   onSendMessage: (
     text: string,
-    attachments?: Array<{ name: string; url: string; size: number }>
+    attachments?: Array<File>
   ) => void;
   isTyping?: boolean;
   onEditMessage?: (messageId: string, newText: string) => void;

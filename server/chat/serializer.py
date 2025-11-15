@@ -5,7 +5,7 @@ class MessageSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
     class Meta:
         model = Message
-        fields = ["id", "conversation_id", "role", "content","file_url", "filename", "timeStamp"]
+        fields = ["id", "conversation_id", "role", "content","file_url", "fileName", "timeStamp"]
     
     def get_file_url(self, obj):
         return obj.file.url if obj.file else None

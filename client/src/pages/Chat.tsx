@@ -42,49 +42,65 @@ const Index = () => {
   const sendMessageMutation = useMutation({
     mutationFn: ({
       text,
+      file,
       conversationId,
     }: {
       text: string;
+      file?: File;
       conversationId: string;
-    }) => send_message(text, conversationId),
-    onMutate: async ({ text }) => {
+    }) => send_message(text, conversationId, file),
+
+    onMutate: async ({ text, file }) => {
       setIsTyping(true);
-      // Optimistic update
+
+      const newMessage = {
+        id: Date.now().toString(),
+        userId: "user",
+        content: text || "",
+        role: MessageRole.user,
+        timeStamp: new Date().toISOString(),
+        isTemporary: true,
+        filePreview: file ? URL.createObjectURL(file) : null, // for temporary UI
+      };
+
       queryClient.setQueryData(
         ["messages", activeConversationId],
         (oldData: any) => ({
-          messages: [
-            ...(oldData?.messages || []),
-            {
-              id: Date.now().toString(),
-              userId: "user",
-              content: text,
-              role: MessageRole.user,
-              timeStamp: new Date().toISOString(),
-              isTemporary: true,
-            },
-          ],
+          messages: [...(oldData?.messages || []), newMessage],
         })
       );
     },
+
     onSuccess: (response) => {
       const prevMessages = messages;
-      if (messages.length > 0 && messages[messages.length - 1].isTemporary) {
+
+      // remove temporary message
+      if (
+        prevMessages.length > 0 &&
+        prevMessages[prevMessages.length - 1].isTemporary
+      ) {
         prevMessages.pop();
       }
+
+      // backend returns: [user_msg, ai_msg]
       queryClient.setQueryData(["messages", activeConversationId], {
         messages: [...prevMessages, ...response.messages],
       });
+
       setIsTyping(false);
     },
   });
 
-  const handleSendMessage = (text: string) => {
+  const handleSendMessage = (text: string, file?: File[]) => {
     if (!activeConversationId) return;
     const conversation_id = activeConversation?.is_temporary
       ? ""
       : activeConversationId;
-    sendMessageMutation.mutate({ text, conversationId: conversation_id });
+    sendMessageMutation.mutate({
+      text,
+      conversationId: conversation_id,
+      file: file ? file[0] : undefined,
+    });
   };
 
   const handleNewChat = () => {

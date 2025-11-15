@@ -7,6 +7,11 @@ from llm.services import generate_with_history
 from .services import add_message, create_conversation, get_all_messages, generate_response, get_messages_for_llm, retrieve_relevant_messages, trim_messages_by_chars
 import core.utils.response as response
 from core.enums import Role
+from django.conf import settings
+from django.core.files.storage import default_storage
+
+print("AWS_STORAGE_BUCKET_NAME =>", settings.AWS_STORAGE_BUCKET_NAME)
+print("Using storage =>", default_storage.__class__)
 
 # Create your views here.
 class MessageView(APIView):
@@ -50,6 +55,7 @@ class MessageView(APIView):
         else:
             conversation = get_object_or_404(Conversation, id=conversation_id)
 
+        print("file---------------",file,file.name)
         # Save user message
         user_message = add_message(conversation.id, Role.USER.value, message_content, file)
 

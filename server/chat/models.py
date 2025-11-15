@@ -1,5 +1,7 @@
 from django.db import models
 from core.enums import Role
+from django.core.files.storage import default_storage
+print("Storage backend:", default_storage.__class__)
 
 # Create your models here.
 class Message(models.Model):
@@ -7,7 +9,7 @@ class Message(models.Model):
     conversation = models.ForeignKey('Conversation', on_delete=models.CASCADE, related_name='messages')
     content = models.TextField()
     file = models.FileField(upload_to="chat_files/",blank=True,null=True)
-    filename = models.TextField(max_length=255,blank=True,null=True)
+    fileName = models.TextField(max_length=255,blank=True,null=True)
     timeStamp = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
@@ -15,7 +17,7 @@ class Message(models.Model):
 
     def __str__(self):
         if self.file:
-            return f"{self.role} sent file: {self.filename}"
+            return f"{self.role} sent file: {self.fileName}"
         return f"{self.role}: {self.content[:40]}"
 
 class Conversation(models.Model):

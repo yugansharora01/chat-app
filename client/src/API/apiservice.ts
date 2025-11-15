@@ -7,38 +7,52 @@ import { type AxiosRequestConfig, type Method } from "axios";
 export const ApiCall = async (
   method: Method,
   url: string,
-  body: Record<string, any> = {},
+  body: any = {},
   params: Record<string, any> = {},
   customHeaders: Record<string, any> = {}
 ) => {
   const token = await authService.getAccessToken();
+
+  const isFormData = body instanceof FormData;
+
   const config: AxiosRequestConfig = {
     method,
     url,
     data: body,
     params,
     headers: {
-      ...customHeaders,
       Authorization: `Bearer ${token}`,
+      ...customHeaders,
+      ...(isFormData
+        ? { "Content-Type": "" }
+        : { "Content-Type": "application/json" }),
+      // 👆 IMPORTANT: Do NOT set Content-Type for FormData
     },
   };
 
+  // Let Axios handle FormData — it will add correct boundary headers
   const response = await axiosClient(config);
   return response.data;
 };
 
 export const send_message = async (
   message: string,
-  conversation_id: string = ""
+  conversation_id: string = "",
+  file?: File
 ): Promise<ChatResponse> => {
+  const formData = new FormData();
+  formData.append("message", message);
+  formData.append("conversation_id", conversation_id);
+  if (file) {
+    formData.append("file", file);
+  }
+
   const response = await ApiCall(
     "POST",
     `${import.meta.env.VITE_SERVER_URL}/chat/messages/`,
-    {
-      message,
-      conversation_id,
-    }
+    formData // ApiCall now supports this
   );
+
   return response?.data;
 };
 

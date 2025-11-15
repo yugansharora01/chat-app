@@ -6,10 +6,7 @@ import { supabase } from "@/utils/supabaseClient";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ChatInputProps {
-  onSendMessage: (
-    message: string,
-    attachments?: Array<{ name: string; url: string; size: number }>
-  ) => void;
+  onSendMessage: (message: string, attachments?: Array<File>) => void;
   disabled?: boolean;
 }
 
@@ -58,56 +55,8 @@ const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
       setIsUploading(true);
 
       try {
-        let uploadedAttachments:
-          | Array<{ name: string; url: string; size: number }>
-          | undefined;
-
-        if (selectedFiles.length > 0) {
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
-          if (!user) {
-            toast({
-              title: "Error",
-              description: "You must be logged in to upload files",
-              variant: "destructive",
-            });
-            setIsUploading(false);
-            return;
-          }
-
-          uploadedAttachments = [];
-
-          for (const file of selectedFiles) {
-            const fileExt = file.name.split(".").pop();
-            const filePath = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-
-            const { error: uploadError } = await supabase.storage
-              .from("chat-documents")
-              .upload(filePath, file);
-
-            if (uploadError) {
-              toast({
-                title: "Upload failed",
-                description: `Failed to upload ${file.name}`,
-                variant: "destructive",
-              });
-              continue;
-            }
-
-            const {
-              data: { publicUrl },
-            } = supabase.storage.from("chat-documents").getPublicUrl(filePath);
-
-            uploadedAttachments.push({
-              name: file.name,
-              url: publicUrl,
-              size: file.size,
-            });
-          }
-        }
-
-        onSendMessage(message.trim(), uploadedAttachments);
+        console.log("selected", selectedFiles);
+        onSendMessage(message.trim(), selectedFiles);
         setMessage("");
         setSelectedFiles([]);
       } catch (error) {

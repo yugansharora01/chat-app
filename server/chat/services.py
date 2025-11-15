@@ -4,8 +4,8 @@ from typing import List, Optional
 from llm.embeddings import get_embedding
 from llm.vector_store import add_to_index, search_index
 
-def add_message(conversation_id, role, content):
-    message = Message(conversation_id=conversation_id, role=role, content=content)
+def add_message(conversation_id, role, content,file):
+    message = Message(conversation_id=conversation_id, role=role, content=content,file=file,fileName=file.name if file else None)
     message.save()
      # Store vector
     embedding = get_embedding(content)

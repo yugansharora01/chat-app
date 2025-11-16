@@ -38,13 +38,15 @@ export const ApiCall = async (
 export const send_message = async (
   message: string,
   conversation_id: string = "",
-  file?: File
+  files?: File[]
 ): Promise<ChatResponse> => {
   const formData = new FormData();
   formData.append("message", message);
   formData.append("conversation_id", conversation_id);
-  if (file) {
-    formData.append("file", file);
+  if (files) {
+    files.forEach((file) => {
+      formData.append("files", file); // multiple
+    });
   }
 
   const response = await ApiCall(
@@ -59,7 +61,7 @@ export const send_message = async (
 export const get_all_messages = async (
   conversation_id: string,
   cursor: string = "",
-  limit: number = 10
+  limit: number = 30
 ): Promise<{ messages: Message[]; meta: Record<string, unknown> }> => {
   const response = await ApiCall(
     "GET",

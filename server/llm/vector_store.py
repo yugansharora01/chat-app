@@ -2,6 +2,9 @@ import faiss
 import numpy as np
 import os
 import pickle
+# llm/vector_store.py
+from documents.models import DocumentChunk
+import math
 
 INDEX_PATH = "faiss_index.bin"
 META_PATH = "faiss_meta.pkl"
@@ -51,3 +54,43 @@ def search_index(query_embedding, top_k=5, filter_conv=None):
 
     return results
 
+
+def _cosine(a, b):
+    # a, b are lists of floats
+    dot = sum(x*y for x,y in zip(a,b))
+    norm_a = math.sqrt(sum(x*x for x in a))
+    norm_b = math.sqrt(sum(x*x for x in b))
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+def save_chunks_for_document(document, chunks_texts, embeddings):
+    """
+    document: Document instance
+    chunks_texts: list[str]
+    embeddings: list[list[float]]
+    """
+    objects = []
+    for text, emb in zip(chunks_texts, embeddings):
+        objects.append(DocumentChunk(document=document, text=text, embedding=emb))
+    DocumentChunk.objects.bulk_create(objects)
+
+def search_chunks(owner_id=None, conversation_id=None, query_embedding=None, top_k=5):
+    """
+    Search chunks by owner or conversation. If owner_id provided, filter by document.owner.
+    Returns list of DocumentChunk ordered by similarity desc.
+    """
+    qs = DocumentChunk.objects.select_related("document")
+    if owner_id:
+        qs = qs.filter(document__owner_id=owner_id)
+    if conversation_id:
+        qs = qs.filter(document__file_attachment__message__conversation_id=conversation_id)
+    # naive approach: compute similarity in Python
+    results = []
+    for chunk in qs:
+        if not chunk.embedding:
+            continue
+        score = _cosine(query_embedding, chunk.embedding)
+        results.append((score, chunk))
+    results.sort(key=lambda x: x[0], reverse=True)
+    return [c for s,c in results[:top_k]]

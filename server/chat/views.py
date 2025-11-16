@@ -3,15 +3,14 @@ from rest_framework import permissions, status
 from rest_framework.views import APIView
 from chat.models import Conversation
 from chat.serializer import ConversationSerializer, MessageSerializer
+from documents.services.document_service import process_file_attachment
+from llm.embeddings import embed
 from llm.services import generate_with_history
-from .services import add_message, create_conversation, get_all_messages, generate_response, get_messages_for_llm, retrieve_relevant_messages, trim_messages_by_chars
+from llm.vector_store import search_chunks
+from .services import add_message, create_conversation, create_file_attachments, get_all_messages, generate_response, get_messages_for_llm, retrieve_relevant_messages, trim_messages_by_chars
 import core.utils.response as response
 from core.enums import Role
-from django.conf import settings
-from django.core.files.storage import default_storage
-
-print("AWS_STORAGE_BUCKET_NAME =>", settings.AWS_STORAGE_BUCKET_NAME)
-print("Using storage =>", default_storage.__class__)
+from django.db import transaction
 
 # Create your views here.
 class MessageView(APIView):
@@ -37,13 +36,14 @@ class MessageView(APIView):
         }
         return response.success(payload)
     
+    @transaction.atomic
     def post(self,request):
         """
         Send a user message and get AI response.
         """
         user = request.user
         
-        file = request.FILES.get("file")
+        files = request.FILES.getlist("files")
         message_content = request.data.get("message")
         conversation_id = request.data.get("conversation_id")
         if not message_content:
@@ -55,17 +55,43 @@ class MessageView(APIView):
         else:
             conversation = get_object_or_404(Conversation, id=conversation_id)
 
-        print("file---------------",file,file.name)
         # Save user message
-        user_message = add_message(conversation.id, Role.USER.value, message_content, file)
+        user_message = add_message(conversation.id, Role.USER.value, message_content)
 
-       # 2) build history for LLM
+        created_attachments = create_file_attachments(files,user_message)
+
+        print("created_attachments: ",created_attachments)
+        
+        for fa in created_attachments:
+            # process synchronously (or put into background later)
+            try:
+                process_file_attachment(fa.id)
+            except Exception as e:
+                # don't crash chat; log and continue
+                import logging
+                logging.exception("Error processing attachment %s: %s", fa.id, str(e))
+
+        # 2) build history for LLM
         messages = retrieve_relevant_messages(conversation.id, message_content, top_k=8)
+
+        # RAG: embed question & search chunks (owner = user id or conversation)
+        question_emb = embed(message_content)
+        print("message_content: ",message_content)
+        print("question_emb: ",question_emb)
+        top_chunks = search_chunks(conversation_id=conversation.id, query_embedding=question_emb, top_k=3)
+        print("top_chunks: ",top_chunks)
+
+        # prepare RAG system messages
+        rag_contexts = []
+        for chunk in top_chunks:
+            rag_contexts.append({"role": "system", "content": f"Document context:\n{chunk.text}"})
+
         
         # add a system prompt at the beginning
         system_prompt = {"role": "system", "content": "You are a helpful assistant."}
-        messages = [system_prompt] + list(reversed(messages))
+        messages = [system_prompt] + rag_contexts + list(reversed(messages))
 
+        print("rag_contexts: ",rag_contexts)
         print("messages: ",messages)
 
         # 3) trim context if needed
@@ -125,7 +151,6 @@ class ConversationView(APIView):
         conversation = create_conversation(user_id,title)
         return response.success({"conversation_id": str(conversation.id), "created": True})
 
-    
     def update(self, request):
         """
         Update conversation title.

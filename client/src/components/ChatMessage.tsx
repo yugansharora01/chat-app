@@ -1,14 +1,15 @@
 import { cn } from "@/lib/utils";
 import { Pencil, Trash2, FileText, Download } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import type { Message } from "@/types";
 
 interface ChatMessageProps {
   message: string;
   isUser: boolean;
   timestamp?: string;
-  attachments?: Array<{ name: string; url: string; size: number }>;
+  attachments?: Message["files"];
   onEdit?: (newText: string) => void;
   onDelete?: () => void;
 }
@@ -30,6 +31,10 @@ const ChatMessage = ({
       setIsEditing(false);
     }
   };
+
+  useEffect(() => {
+    console.log(attachments);
+  }, [attachments]);
 
   return (
     <div
@@ -94,16 +99,18 @@ const ChatMessage = ({
                 {attachments.map((file, index) => (
                   <a
                     key={index}
-                    href={file.url}
+                    href={file?.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 bg-background/50 rounded-lg px-3 py-2 hover:bg-background/70 transition-colors"
                   >
                     <FileText className="h-4 w-4" />
-                    <span className="text-sm flex-1 truncate">{file.name}</span>
-                    <span className="text-xs opacity-60">
-                      {(file.size / 1024).toFixed(1)}KB
+                    <span className="text-sm flex-1 truncate">
+                      {file?.file_name}
                     </span>
+                    {/* <span className="text-xs opacity-60">
+                      {(file.size / 1024).toFixed(1)}KB
+                    </span> */}
                     <Download className="h-4 w-4" />
                   </a>
                 ))}

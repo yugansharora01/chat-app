@@ -1,14 +1,22 @@
 from rest_framework import serializers
-from .models import Conversation, Message
+from .models import Conversation, FileAttachment, Message
+
+class FileAttachmentSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FileAttachment
+        fields = ["id", "file_name", "file_url"]
+
+    def get_file_url(self, obj):
+        return obj.file.url
 
 class MessageSerializer(serializers.ModelSerializer):
-    file_url = serializers.SerializerMethodField()
+    files = FileAttachmentSerializer(many=True, read_only=True)
+
     class Meta:
         model = Message
-        fields = ["id", "conversation_id", "role", "content","file_url", "fileName", "timeStamp"]
-    
-    def get_file_url(self, obj):
-        return obj.file.url if obj.file else None
+        fields = ["id", "role", "content", "files", "timeStamp"]
 
 class ConversationSerializer(serializers.ModelSerializer):
     class Meta:

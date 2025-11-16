@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'core',
     'chat',
     'llm',
+    'documents',
     "corsheaders",
     "storages"
 ]

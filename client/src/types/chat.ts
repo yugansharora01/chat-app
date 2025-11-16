@@ -11,7 +11,7 @@ export interface Message {
   content: string;
   timeStamp: string;
   isTemporary?: boolean;
-  attachments?: Array<{ name: string; url: string; size: number }>;
+  files?: Array<{ file_name: string; file_url: string }>;
 }
 
 export interface ChatResponse {

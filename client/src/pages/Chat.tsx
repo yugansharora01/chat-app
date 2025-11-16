@@ -42,15 +42,15 @@ const Index = () => {
   const sendMessageMutation = useMutation({
     mutationFn: ({
       text,
-      file,
+      files,
       conversationId,
     }: {
       text: string;
-      file?: File;
+      files?: File[];
       conversationId: string;
-    }) => send_message(text, conversationId, file),
+    }) => send_message(text, conversationId, files),
 
-    onMutate: async ({ text, file }) => {
+    onMutate: async ({ text, files }) => {
       setIsTyping(true);
 
       const newMessage = {
@@ -60,7 +60,12 @@ const Index = () => {
         role: MessageRole.user,
         timeStamp: new Date().toISOString(),
         isTemporary: true,
-        filePreview: file ? URL.createObjectURL(file) : null, // for temporary UI
+        files: files
+          ? files.map((file) => {
+              file_name: file.name;
+              file_url: URL.createObjectURL(file);
+            })
+          : null, // for temporary UI
       };
 
       queryClient.setQueryData(
@@ -91,7 +96,7 @@ const Index = () => {
     },
   });
 
-  const handleSendMessage = (text: string, file?: File[]) => {
+  const handleSendMessage = (text: string, files?: File[]) => {
     if (!activeConversationId) return;
     const conversation_id = activeConversation?.is_temporary
       ? ""
@@ -99,7 +104,7 @@ const Index = () => {
     sendMessageMutation.mutate({
       text,
       conversationId: conversation_id,
-      file: file ? file[0] : undefined,
+      files: files,
     });
   };
 

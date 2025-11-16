@@ -8,7 +8,7 @@ from llm.embeddings import embed
 from llm.vector_store import save_chunks_for_document
 
 @transaction.atomic
-def process_file_attachment(file_attachment_id):
+def process_file_attachment(file_attachment_id, owner_id):
     """
     Process single FileAttachment:
       - extract text
@@ -30,6 +30,7 @@ def process_file_attachment(file_attachment_id):
     document, created = Document.objects.get_or_create(
         file_attachment=fa,
         defaults={
+            "owner_id": owner_id,
             "filename": fa.file_name or fa.file.name,
             "extracted_text": extracted or "",
         }

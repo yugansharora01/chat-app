@@ -4,9 +4,9 @@ from documents.models import Document, DocumentChunk
 
 # Register your models here.
 @admin.register(Document)
-class MessageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'file_attachment', 'filename', 'filename', 'created_at')
+class DocumentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'file_attachment','owner_id', 'filename', 'filename', 'created_at')
 
 @admin.register(DocumentChunk)
-class ConversationAdmin(admin.ModelAdmin):
+class DocumentChunkAdmin(admin.ModelAdmin):
     list_display = ('id', 'document',  'text', 'embedding','created_at')

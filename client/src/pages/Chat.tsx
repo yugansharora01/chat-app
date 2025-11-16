@@ -61,10 +61,10 @@ const Index = () => {
         timeStamp: new Date().toISOString(),
         isTemporary: true,
         files: files
-          ? files.map((file) => {
-              file_name: file.name;
-              file_url: URL.createObjectURL(file);
-            })
+          ? files.map((file) => ({
+              file_name: file.name,
+              file_url: URL.createObjectURL(file),
+            }))
           : null, // for temporary UI
       };
 

@@ -6,7 +6,8 @@ from chat.models import FileAttachment
 
 class Document(models.Model):
     file_attachment = models.ForeignKey(FileAttachment,on_delete=models.CASCADE,related_name="documents")
-    filename = models.CharField(max_length=255)
+    owner_id = models.CharField(max_length=255)
+    filename = models.CharField(max_length=512)
     extracted_text  = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -61,11 +61,11 @@ class MessageView(APIView):
         created_attachments = create_file_attachments(files,user_message)
 
         print("created_attachments: ",created_attachments)
-        
+
         for fa in created_attachments:
             # process synchronously (or put into background later)
             try:
-                process_file_attachment(fa.id)
+                process_file_attachment(fa.id,owner_id=user.id)
             except Exception as e:
                 # don't crash chat; log and continue
                 import logging
@@ -78,7 +78,7 @@ class MessageView(APIView):
         question_emb = embed(message_content)
         print("message_content: ",message_content)
         print("question_emb: ",question_emb)
-        top_chunks = search_chunks(conversation_id=conversation.id, query_embedding=question_emb, top_k=3)
+        top_chunks = search_chunks(owner_id=user.id,conversation_id=conversation.id, query_embedding=question_emb, top_k=3)
         print("top_chunks: ",top_chunks)
 
         # prepare RAG system messages

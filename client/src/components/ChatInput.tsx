@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Paperclip, X, FileText } from "lucide-react";
-import { supabase } from "@/utils/supabaseClient";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ChatInputProps {

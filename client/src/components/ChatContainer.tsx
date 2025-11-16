@@ -51,7 +51,7 @@ const ChatContainer = ({
                   message={message.content}
                   isUser={message.role === MessageRole.user}
                   timestamp={message.timeStamp}
-                  attachments={message.attachments}
+                  attachments={message.files}
                   onEdit={
                     onEditMessage
                       ? (newText) => onEditMessage(message.id, newText)

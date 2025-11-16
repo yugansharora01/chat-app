@@ -1,14 +1,14 @@
 from core.enums import Role
-from .models import Message , Conversation
+from .models import FileAttachment, Message , Conversation
 from typing import List, Optional
-from llm.embeddings import get_embedding
+from llm.embeddings import embed
 from llm.vector_store import add_to_index, search_index
 
 def add_message(conversation_id, role, content, file=None):
-    message = Message(conversation_id=conversation_id, role=role, content=content,file=file,fileName=file.name if file else None)
+    message = Message(conversation_id=conversation_id, role=role, content=content)
     message.save()
      # Store vector
-    embedding = get_embedding(content)
+    embedding = embed(content)
     add_to_index(embedding, {
         "id": message.id,
         "conversation_id": conversation_id,
@@ -81,9 +81,19 @@ def trim_messages_by_chars(messages,max_chars=30000):
     return list(reversed(kept))
 
 def retrieve_relevant_messages(conversation_id, query, top_k=8):
-    query_emb = get_embedding(query)
+    query_emb = embed(query)
     results = search_index(query_emb, top_k=top_k, filter_conv=conversation_id)
     return [
         {"role": r["role"], "content": r["content"]}
         for r in results
     ]
+
+def create_file_attachments(files,user_message):
+    file_attachments = []
+    for f in files:
+        file_attachments.append(FileAttachment.objects.create(
+            message=user_message,
+            file=f,
+            file_name=f.name
+        ))
+    return file_attachments

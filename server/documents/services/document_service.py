@@ -31,7 +31,7 @@ def process_file_attachment(file_attachment_id, owner_id):
         file_attachment=fa,
         defaults={
             "owner_id": owner_id,
-            "filename": fa.file_name or fa.file.name,
+            "file_name": fa.file_name or fa.file.name,
             "extracted_text": extracted or "",
         }
     )

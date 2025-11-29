@@ -31,7 +31,6 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_ALLOWED_ORIGINS", "").split(",")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-
 # Application definition
 
 INSTALLED_APPS = [

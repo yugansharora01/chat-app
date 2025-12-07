@@ -13,26 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Debug PyPI from runner
-        run: |
-          echo "Runner environment"
-          python3 -V
-          pip3 --version
-          pip3 config list || true
-          env | grep -i PIP || true
-
-          echo
-          echo "curl head for simple index (no redirect)"
-          curl -vI https://pypi.org/simple/deta/ || true
-
-          echo
-          echo "curl follow redirects for JSON metadata"
-          curl -vL https://pypi.org/pypi/deta/json || true
-
-          echo
-          echo "Try pip install directly from runner"
-          pip3 install deta==1.2.0 -vvv || true
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:

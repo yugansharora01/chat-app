@@ -7,6 +7,8 @@ ENV PYTHONBUFFERED=1
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \    
+    git \
     build-essential \
     libopenblas-dev \
     liblapack-dev \

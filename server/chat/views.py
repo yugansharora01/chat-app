@@ -73,7 +73,24 @@ class MessageView(APIView):
                 logging.exception("Error processing attachment %s: %s", fa.id, str(e))
 
         # 2) build history for LLM
-        messages = retrieve_relevant_messages(conversation.id, message_content, top_k=8)
+        # Fetch last 5 messages (returns Oldest -> Newest)
+        last_5_messages, _ = get_all_messages(conversation.id, limit=5)
+        
+        # Fetch top 10 relevant messages
+        relevant_messages_dicts = retrieve_relevant_messages(conversation.id, message_content, top_k=10)
+
+        # Deduplicate: Filter relevant messages that are already in last_5_messages
+        last_5_ids = {m.id for m in last_5_messages}
+        filtered_relevant = [m for m in relevant_messages_dicts if m['id'] not in last_5_ids]
+
+        # Sort filtered relevant messages by ID to maintain chronological order
+        filtered_relevant.sort(key=lambda x: x['id'])
+
+        # Sanitize filtered_relevant to remove 'id' before passing to LLM (if needed) and ensure consistent format
+        final_relevant = [{"role": m["role"].lower(), "content": m["content"]} for m in filtered_relevant]
+
+        # Convert last_5_messages to dicts
+        final_last_5 = [{"role": m.role.lower(), "content": m.content} for m in last_5_messages]
 
         # RAG: embed question & search chunks (owner = user id or conversation)
         question_emb = embed(message_content)
@@ -90,10 +107,14 @@ class MessageView(APIView):
         
         # add a system prompt at the beginning
         system_prompt = {"role": "system", "content": "You are a helpful assistant."}
-        messages = [system_prompt] + rag_contexts + list(reversed(messages))
+        
+        # Combine: System + RAG + Relevant History + Recent History
+        messages = [system_prompt] + rag_contexts + final_relevant + final_last_5
 
         print("rag_contexts: ",rag_contexts)
         print("messages: ",messages)
+        print("final_relevant: ",final_relevant)
+        print("final_last_5: ", final_last_5)
 
         # 3) trim context if needed
         messages = trim_messages_by_chars(messages, max_chars=25000)

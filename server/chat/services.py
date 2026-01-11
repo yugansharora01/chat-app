@@ -85,7 +85,7 @@ def retrieve_relevant_messages(conversation_id, query, top_k=8):
     query_emb = embed(query)
     results = search_index(query_emb, top_k=top_k, filter_conv=conversation_id)
     return [
-        {"role": r["role"], "content": r["content"]}
+        {"id": r["id"], "role": r["role"], "content": r["content"]}
         for r in results
     ]
 

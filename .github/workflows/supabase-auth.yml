@@ -24,7 +24,7 @@ jobs:
 
       - name: Ping Supabase Auth
         working-directory: server
-        run: python manage.py ping_supabase_auth
+        run: python manage.py ping_supabase_auth --skip-checks
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}

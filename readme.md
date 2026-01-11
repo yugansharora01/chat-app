@@ -165,4 +165,4 @@ PRs and suggestions are welcome!
 
 ## 📄 License
 
-MIT License.
+MIT License..

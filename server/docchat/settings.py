@@ -17,26 +17,13 @@ from dotenv import load_dotenv
 import dj_database_url
 
 load_dotenv()
-def clean_list(env_value):
-    if not env_value:
-        return []
-    return [v for v in env_value.split(",") if v]
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
-SECRET_KEY = os.getenv("SECRET_KEY", "fallback-key")
-SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "fallback-key")
-
-ALLOWED_HOSTS = clean_list(os.getenv("ALLOWED_HOSTS"))
-
-CSRF_TRUSTED_ORIGINS = clean_list(
-    os.getenv("CSRF_TRUSTED_ORIGINS")
-)
-
-CORS_ALLOWED_ORIGINS = clean_list(
-    os.getenv("CORS_ALLOWED_ORIGINS")
-)
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_ALLOWED_ORIGINS", "").split(",")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -167,6 +154,8 @@ AWS_S3_VERIFY = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/vol/static'
+
+SECRET_KEY = os.getenv("SECRET_KEY","")
 
 
 STORAGES = {

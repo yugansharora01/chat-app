@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'llm',
     'documents',
     "corsheaders",
-    "storages"
+    "storages",
+    'docchat',
 ]
 
 MIDDLEWARE = [

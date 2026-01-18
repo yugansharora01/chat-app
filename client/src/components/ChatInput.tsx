@@ -150,7 +150,7 @@ const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
           variant="outline"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || isUploading}
-          className="h-[60px] w-[60px] rounded-2xl shrink-0"
+          className="min-h-[30px] aspect-square md:h-[60px] md:w-[60px] rounded-2xl shrink-0"
         >
           <Paperclip className="h-5 w-5" />
         </Button>
@@ -160,7 +160,7 @@ const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
           onKeyDown={handleKeyDown}
           placeholder="Type your message..."
           disabled={disabled || isUploading}
-          className="min-h-[60px] max-h-[200px] resize-none rounded-2xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
+          className="min-h-[30px] md:min-h-[60px] max-h-[200px] resize-none rounded-2xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
           rows={1}
         />
         <Button
@@ -171,7 +171,7 @@ const ChatInput = ({ onSendMessage, disabled }: ChatInputProps) => {
             isUploading
           }
           size="icon"
-          className="h-[60px] w-[60px] rounded-2xl bg-[hsl(var(--chat-user-bg))] hover:opacity-90 transition-[var(--transition-smooth)] shrink-0"
+          className="min-h-[30px] aspect-square md:h-[60px] md:w-[60px] rounded-2xl bg-[hsl(var(--chat-user-bg))] hover:opacity-90 transition-[var(--transition-smooth)] shrink-0"
         >
           <Send className="h-5 w-5" />
         </Button>

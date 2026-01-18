@@ -33,12 +33,6 @@ export const Navbar = () => {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (theme === undefined) {
-      setTheme("dark");
-    }
-  }, [theme, setTheme]);
-
   return (
     <nav className="border-b bg-card">
       <div className="flex h-16 items-center px-4 gap-4">

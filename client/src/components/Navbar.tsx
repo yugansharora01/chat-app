@@ -1,4 +1,4 @@
-import { Moon, Sun, User, LogOut } from "lucide-react";
+import { Moon, Sun, User, LogOut, Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/Button";
 import {
@@ -11,6 +11,22 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { useSidebar } from "@/context/SidebarContext";
+import { useLocation } from "react-router-dom";
+
+const MobileMenu = () => {
+  const { toggleSidebar, isMobile } = useSidebar();
+  const location = useLocation();
+  const isChatPage = location.pathname.startsWith("/chat");
+
+  if (!isMobile || !isChatPage) return null;
+
+  return (
+    <Button variant="ghost" size="icon" onClick={toggleSidebar} className="mr-2">
+      <Menu className="h-5 w-5" />
+    </Button>
+  );
+};
 
 export const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -26,12 +42,16 @@ export const Navbar = () => {
   return (
     <nav className="border-b bg-card">
       <div className="flex h-16 items-center px-4 gap-4">
+        <div className="flex items-center gap-2">
+           <MobileMenu />
+        </div>
         <h1
           className="text-xl font-semibold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent cursor-pointer"
           onClick={() => navigate("/")}
         >
           AI Chat
         </h1>
+
 
         <div className="ml-auto flex items-center gap-2">
           <Button

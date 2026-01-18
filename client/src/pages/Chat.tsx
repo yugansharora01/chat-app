@@ -10,10 +10,13 @@ import {
 } from "@/API/apiservice";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useSidebar } from "@/context/SidebarContext";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { isMobile, open, setOpen } = useSidebar();
   const queryClient = useQueryClient();
   const [activeConversationId, setActiveConversationId] = useState<string>("");
   const [isTyping, setIsTyping] = useState(false);
@@ -123,6 +126,9 @@ const Index = () => {
 
   const handleSelectConversation = (id: string) => {
     setActiveConversationId(id);
+    if (isMobile) {
+      setOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -154,12 +160,27 @@ const Index = () => {
   return (
     <div className="flex flex-col h-[calc(100vh-65px)]">
       <div className="flex flex-1 overflow-hidden">
-        <ConversationSidebar
-          conversations={conversations}
-          activeConversationId={activeConversationId}
-          onSelectConversation={handleSelectConversation}
-          onNewChat={handleNewChat}
-        />
+        {!isMobile && (
+          <ConversationSidebar
+            conversations={conversations}
+            activeConversationId={activeConversationId}
+            onSelectConversation={handleSelectConversation}
+            onNewChat={handleNewChat}
+          />
+        )}
+        {isMobile && (
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetContent side="left" className="p-0 w-[17rem]">
+              <ConversationSidebar
+                conversations={conversations}
+                activeConversationId={activeConversationId}
+                onSelectConversation={handleSelectConversation}
+                onNewChat={handleNewChat}
+                className="w-full border-none"
+              />
+            </SheetContent>
+          </Sheet>
+        )}
         <div className="flex-1">
           <ChatContainer
             messages={messages}

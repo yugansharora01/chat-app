@@ -9,6 +9,7 @@ interface ConversationSidebarProps {
   activeConversationId: string | null;
   onSelectConversation: (id: string) => void;
   onNewChat: () => void;
+  className?: string;
 }
 
 export const ConversationSidebar = ({
@@ -16,9 +17,10 @@ export const ConversationSidebar = ({
   activeConversationId,
   onSelectConversation,
   onNewChat,
+  className,
 }: ConversationSidebarProps) => {
   return (
-    <div className="w-64 border-r bg-card flex flex-col h-full">
+    <div className={cn("w-64 border-r bg-card flex flex-col h-full max-md:pt-8", className)}>
       <div className="p-4 border-b">
         <Button
           onClick={onNewChat}

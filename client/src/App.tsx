@@ -8,6 +8,7 @@ import NotFound from "@/pages/NotFound";
 import Auth from "@/pages/Auth";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "./components/Navbar";
+import { SidebarProvider } from "./context/SidebarContext";
 
 const queryClient = new QueryClient();
 
@@ -21,7 +22,8 @@ function App() {
       >
         <TooltipProvider>
           <BrowserRouter>
-          <Navbar />
+          <SidebarProvider>
+            <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/chat" element={<Chat />} />
@@ -29,6 +31,7 @@ function App() {
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+          </SidebarProvider>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

@@ -103,7 +103,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] py-8">
+      <div className="container flex items-center justify-center min-h-[calc(100dvh-4rem)] py-8">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl text-center">Welcome</CardTitle>

@@ -1,11 +1,11 @@
 @import "tailwindcss";              
 
 .page {
-  @apply flex flex-col items-center justify-center h-[100dvh] w-[100vw];
+  @apply flex flex-col items-center justify-center h-[100ddvh] w-[100vw];
 }
 
 .chatContainer {
-  @apply w-[70%] max-w-[1000px] h-[100vh] flex flex-col;
+  @apply w-[70%] max-w-[1000px] h-[100dvh] flex flex-col;
 }
 
 .messagesContainer {
